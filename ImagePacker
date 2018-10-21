@@ -57,7 +57,7 @@ def main():
                         rotated_img = default_blobs[blob_i].rotate(rotation_count * 90)
                         # Insert the rotated blob.
                         blob_tile_set.paste(rotated_img, (row * image_size, col * image_size))
-    
+
     # Final Image
     blob_tile_set.save("blob_tile_set.png")
 
