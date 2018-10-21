@@ -1,4 +1,4 @@
-from PIL import Image, ImageFilter
+from PIL import Image
 import os
 
 
@@ -11,9 +11,8 @@ def main():
     blob_image_values = []
     blob_image_values.extend((0, 1, 5, 7, 17, 21, 23, 29, 31, 85, 87, 95, 119, 127, 255))
 
-    # File directory and size for blobs.
+    # File directory and default size for blobs.
     image_directory = "Blobs"
-    image_size = 64
 
     # Find all images to combine. Are originally in alphabetical order, so numbered sorting is needed.
     default_blobs = []
@@ -23,7 +22,10 @@ def main():
     for fileName in file_list:
         default_blobs.append(Image.open(image_directory + "/" + fileName))
 
-    # Create the image to combine into.
+    # Record the width/height of the image.
+    image_size = default_blobs[0].size[0]
+
+    # Create the final tileset image to combine into.
     tile_size = image_size * len(blob_tile_array[0])
     blob_tile_set = Image.new("RGB", (tile_size, tile_size), color='purple')
 
