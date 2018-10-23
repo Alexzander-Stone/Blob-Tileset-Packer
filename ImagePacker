@@ -7,11 +7,17 @@ import os
 class BlobPacker:
     # File directory and default size for blobs.
     image_directory = "Blobs"
+    config_file = "caeles packed tiles"
+    config_path = ""
+    tileset_config = []
 
     # Widget creation for app.
     def __init__(self, master):
         frame = Frame(master)
         frame.pack()
+		
+		# Setup default configuration
+        self.setup_config()
 
         self.information = Label(frame, text="Make sure to name your blob tiles after their blob values!")
         self.information.pack(side=TOP)
@@ -21,6 +27,9 @@ class BlobPacker:
 
         self.button = Button(frame, text="Select blob image directory: " + self.image_directory, command=self.directory_selection)
         self.button.pack(side=LEFT)
+       
+        self.config = Button(frame, text="Select tileset .txt config file: " + self.config_file, command=self.setup_config)
+        self.config.pack(side=LEFT)
 
         self.create = Button(frame, text="Create Tileset", command=self.create_tileset)
         self.create.pack(side=RIGHT)
@@ -30,6 +39,15 @@ class BlobPacker:
         self.image_directory = filedialog.askdirectory()
         # Update text on app.
         self.button.config(text=self.image_directory)
+	
+    # Change the configuration of the tileset to create.
+    def setup_config(self):
+        # Select text document to use.
+        self.config_path = filedialog.askopenfilename()
+        full_path = self.config_path.split("/")
+        self.config_file = full_path[len(full_path)-1]
+        self.tileset_config.append([])
+        self.tileset_config[0].append(0)
 
     # Creation of the tileset image.
     def create_tileset(self):
