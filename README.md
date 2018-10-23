@@ -20,7 +20,11 @@ The example uses caeles tile setup (which can be found [here](https://opengamear
 
 1. Place your default blob tiles into the Blobs folder. Names need to be in accordance with the default blob values in caeles tileset.
 2. Run the program in your command line or favorite IDE.
-3. The resulting tile set will be found within the project folder.
+3. Press the blob directory button and lead it to your the directory containing your images.
+4. Press the configuration file button and lead it to your packer configuration text file.
+5. Press the CreateTileset and wait until Finished has appeared.
+6. The resulting tile set will be found within the Finished project folder.
+7. Enjoy!
 
 # Acknowledgements
 [Tileset Art - Casey Fallon](http://www.cfallondesign.com/)
