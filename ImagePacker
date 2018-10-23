@@ -38,8 +38,11 @@ class BlobPacker:
         self.button.config(text=self.image_directory)
 	
     # Change the configuration of the tileset to create.
+    # Allows user to select the text document to use.
     def setup_config(self):
-        # Select text document to use.
+        # Clear the previous config.
+        self.tileset_config.clear()
+
         self.config_path = filedialog.askopenfilename()
         full_path = self.config_path.split("/")
         self.config_file = full_path[len(full_path)-1]
