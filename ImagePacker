@@ -16,20 +16,17 @@ class BlobPacker:
         frame = Frame(master)
         frame.pack()
 		
-		# Setup default configuration
-        self.setup_config()
-
         self.information = Label(frame, text="Make sure to name your blob tiles after their blob values!")
         self.information.pack(side=TOP)
 
         self.quit = Button(frame, text="Quit", fg="red", command=frame.quit)
         self.quit.pack(side=LEFT)
 
-        self.button = Button(frame, text="Select blob image directory: " + self.image_directory, command=self.directory_selection)
+        self.button = Button(frame, text="Select blob image directory!", command=self.directory_selection)
         self.button.pack(side=LEFT)
        
-        self.config = Button(frame, text="Select tileset .txt config file: " + self.config_file, command=self.setup_config)
-        self.config.pack(side=LEFT)
+        self.configuration = Button(frame, text="Select tileset .txt config file!", command=self.setup_config)
+        self.configuration.pack(side=LEFT)
 
         self.create = Button(frame, text="Create Tileset", command=self.create_tileset)
         self.create.pack(side=RIGHT)
@@ -55,6 +52,10 @@ class BlobPacker:
             line_values = line.split(",")
             for value in line_values:
                 self.tileset_config[count].append(int(value))
+        file.close()
+        
+        # Update text on app.
+        self.configuration.config(text=self.config_file)
 
     # Creation of the tileset image.
     def create_tileset(self):
@@ -109,7 +110,12 @@ class BlobPacker:
                             blob_tile_set.paste(rotated_img, (row * image_size, col * image_size))
 
         # Final Image
-        blob_tile_set.save("blob_tile_set.png")
+        finished_filename = "Finished/blob_tile_set"
+        count = 0
+        while os.path.isfile(finished_filename+"_"+str(count)+".png"):
+            count += 1
+        finished_filename += "_" + str(count) + ".png"
+        blob_tile_set.save(finished_filename)
 
         # Update app with finished text.
         self.create.config(text="Finished!")
