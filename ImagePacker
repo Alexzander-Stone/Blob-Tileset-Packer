@@ -1,84 +1,121 @@
+from tkinter import *
+from tkinter import filedialog
+
 from PIL import Image
 import os
 
-
-def main():
-    # Blob tile set type.
-    blob_tile_array = []
-    blob_caeles_tile_setup(blob_tile_array)
-
-    # Default blob values.
-    blob_image_values = []
-    blob_image_values.extend((0, 1, 5, 7, 17, 21, 23, 29, 31, 85, 87, 95, 119, 127, 255))
-
+class BlobPacker:
     # File directory and default size for blobs.
     image_directory = "Blobs"
 
-    # Find all images to combine. Are originally in alphabetical order, so numbered sorting is needed.
-    default_blobs = []
-    file_list = os.listdir(image_directory)
-    file_list.sort(key=sort_files)
+    # Widget creation for app.
+    def __init__(self, master):
+        frame = Frame(master)
+        frame.pack()
 
-    for fileName in file_list:
-        default_blobs.append(Image.open(image_directory + "/" + fileName))
+        self.information = Label(frame, text="Make sure to name your blob tiles after their blob values!")
+        self.information.pack(side=TOP)
 
-    # Record the width/height of the image.
-    image_size = default_blobs[0].size[0]
+        self.quit = Button(frame, text="Quit", fg="red", command=frame.quit)
+        self.quit.pack(side=LEFT)
 
-    # Create the final tileset image to combine into.
-    tile_size = image_size * len(blob_tile_array[0])
-    blob_tile_set = Image.new("RGB", (tile_size, tile_size), color='purple')
+        self.button = Button(frame, text="Select blob image directory: " + self.image_directory, command=self.directory_selection)
+        self.button.pack(side=LEFT)
 
-    # Determine how to combine default blobs (and their rotations) to make the tile set.
-    # If a default blob can not satisfy the blob tile value, then one must be rotated
-    # to satisfy it. Reverse rotate from the blob value until it has reached a default blob
-    # value. Then, using a counter, apply a rotation to that default blob.
-    for col, col_val in enumerate(blob_tile_array):
-        for row, row_val in enumerate(blob_tile_array[col]):
-            valueToFind = row_val
-            hasFound = False
-            # Image is a default blob.
-            for blob_i, b_value in enumerate(blob_image_values):
-                if valueToFind == b_value:
-                    # Insert the default blob.
-                    blob_tile_set.paste(default_blobs[blob_i], (row * image_size, col * image_size))
-                    hasFound = True
-            # Image is a blob that was rotated, find how many reverse rotations are needed
-            # to reach the original blob.
-            if not hasFound:
-                rotation_count = 4
-                while not valueToFind in blob_image_values:
-                    rotation_count -= 1
-                    newValue = valueToFind
-                    # Need to account for modulus 255 by checking for decimal values.
-                    while newValue/4 - int(newValue/4) != 0:
-                        newValue = (newValue+255)
-                    valueToFind = newValue / 4
+        self.create = Button(frame, text="Create Tileset", command=self.create_tileset)
+        self.create.pack(side=RIGHT)
+
+    # User selection of where the blob directory is found.
+    def directory_selection(self):
+        self.image_directory = filedialog.askdirectory()
+        # Update text on app.
+        self.button.config(text=self.image_directory)
+
+    # Creation of the tileset image.
+    def create_tileset(self):
+        # Blob tile set type.
+        blob_tile_array = []
+        self.blob_caeles_tile_setup(blob_tile_array)
+
+        # Default blob values.
+        blob_image_values = []
+        blob_image_values.extend((0, 1, 5, 7, 17, 21, 23, 29, 31, 85, 87, 95, 119, 127, 255))
+
+        # Find all images to combine. Are originally in alphabetical order, so numbered sorting is needed.
+        default_blobs = []
+        file_list = os.listdir(self.image_directory)
+        file_list.sort(key=self.sort_files)
+
+        for fileName in file_list:
+            default_blobs.append(Image.open(self.image_directory + "/" + fileName))
+
+        # Record the width/height of the image.
+        image_size = default_blobs[0].size[0]
+
+        # Create the final tileset image to combine into.
+        tile_size = image_size * len(blob_tile_array[0])
+        blob_tile_set = Image.new("RGB", (tile_size, tile_size), color='purple')
+
+        # Determine how to combine default blobs (and their rotations) to make the tile set.
+        # If a default blob can not satisfy the blob tile value, then one must be rotated
+        # to satisfy it. Reverse rotate from the blob value until it has reached a default blob
+        # value. Then, using a counter, apply a rotation to that default blob.
+        for col, col_val in enumerate(blob_tile_array):
+            for row, row_val in enumerate(blob_tile_array[col]):
+                valueToFind = row_val
+                hasFound = False
+                # Image is a default blob.
                 for blob_i, b_value in enumerate(blob_image_values):
                     if valueToFind == b_value:
-                        rotated_img = default_blobs[blob_i].rotate(rotation_count * 90)
-                        # Insert the rotated blob.
-                        blob_tile_set.paste(rotated_img, (row * image_size, col * image_size))
+                        # Insert the default blob.
+                        blob_tile_set.paste(default_blobs[blob_i], (row * image_size, col * image_size))
+                        hasFound = True
+                # Image is a blob that was rotated, find how many reverse rotations are needed
+                # to reach the original blob.
+                if not hasFound:
+                    rotation_count = 4
+                    while not valueToFind in blob_image_values:
+                        rotation_count -= 1
+                        newValue = valueToFind
+                        # Need to account for modulus 255 by checking for decimal values.
+                        while newValue / 4 - int(newValue / 4) != 0:
+                            newValue = (newValue + 255)
+                        valueToFind = newValue / 4
+                    for blob_i, b_value in enumerate(blob_image_values):
+                        if valueToFind == b_value:
+                            rotated_img = default_blobs[blob_i].rotate(rotation_count * 90)
+                            # Insert the rotated blob.
+                            blob_tile_set.paste(rotated_img, (row * image_size, col * image_size))
 
-    # Final Image
-    blob_tile_set.save("blob_tile_set.png")
+        # Final Image
+        blob_tile_set.save("blob_tile_set.png")
+
+        # Update app with finished text.
+        self.create.config(text="Finished!")
+
+    # Caeles tilset structure setup.
+    def blob_caeles_tile_setup(self, blob_tile_array):
+        for i in range(7):
+            blob_tile_array.append([])
+        blob_tile_array[0].extend((0, 4, 84, 92, 124, 116, 80))
+        blob_tile_array[1].extend((16, 28, 117, 95, 255, 253, 113))
+        blob_tile_array[2].extend((21, 87, 221, 127, 255, 247, 209))
+        blob_tile_array[3].extend((29, 125, 119, 199, 215, 213, 81))
+        blob_tile_array[4].extend((31, 255, 241, 20, 65, 17, 1))
+        blob_tile_array[5].extend((23, 223, 245, 85, 68, 93, 112))
+        blob_tile_array[6].extend((5, 71, 197, 69, 64, 7, 193))
+
+    # Sort is ascending by default in lists.
+    def sort_files(self, elem):
+        name = elem.split(".")
+        return int(name[0])
 
 
-def blob_caeles_tile_setup(blob_tile_array):
-    for i in range(7):
-        blob_tile_array.append([])
-    blob_tile_array[0].extend((0, 4, 84, 92, 124, 116, 80))
-    blob_tile_array[1].extend((16, 28, 117, 95, 255, 253, 113))
-    blob_tile_array[2].extend((21, 87, 221, 127, 255, 247, 209))
-    blob_tile_array[3].extend((29, 125, 119, 199, 215, 213, 81))
-    blob_tile_array[4].extend((31, 255, 241, 20, 65, 17, 1))
-    blob_tile_array[5].extend((23, 223, 245, 85, 68, 93, 112))
-    blob_tile_array[6].extend((5, 71, 197, 69, 64, 7, 193))
+def main():
+    root = Tk()
+    app = BlobPacker(root)
 
-# Sort is ascending by default in lists.
-def sort_files(elem):
-    name = elem.split(".")
-    return int(name[0])
+    root.mainloop()
 
 
 if __name__ == "__main__":
